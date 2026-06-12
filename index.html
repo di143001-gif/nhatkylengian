@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Nhật ký lên giàn - Thủy canh</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            background: #e8f5e9;
+            padding: 12px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding-bottom: 30px;
+        }
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .card {
+            background: white;
+            border-radius: 24px;
+            padding: 18px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 1px solid #d4e8d0;
+        }
+        h2 {
+            color: #2e7d32;
+            font-size: 1.3rem;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .form-group {
+            margin-bottom: 14px;
+        }
+        label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #3a5e3b;
+            display: block;
+            margin-bottom: 5px;
+        }
+        select, input {
+            width: 100%;
+            padding: 12px 14px;
+            font-size: 16px;
+            border: 1px solid #c8e6c9;
+            border-radius: 24px;
+            background: white;
+            transition: 0.2s;
+        }
+        select:focus, input:focus {
+            outline: none;
+            border-color: #2e7d32;
+            box-shadow: 0 0 0 3px rgba(46,125,50,0.1);
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            background: #2e7d32;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: 0.1s;
+        }
+        button:active {
+            transform: scale(0.97);
+        }
+        button:disabled {
+            background: #9e9e9e;
+            transform: none;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 20px;
+            margin-top: 12px;
+            text-align: center;
+            font-size: 0.85rem;
+            display: none;
+        }
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            display: block;
+        }
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+        .status-loading {
+            background: #fff3cd;
+            color: #856404;
+            display: block;
+        }
+        .history-item {
+            background: #f9fdf8;
+            border: 1px solid #d4ebd0;
+            border-radius: 18px;
+            padding: 12px;
+            margin-bottom: 10px;
+            transition: 0.2s;
+        }
+        .history-item.marked {
+            background: #fff3e0;
+            border-color: #ffcc80;
+        }
+        .history-info {
+            font-size: 13px;
+            line-height: 1.45;
+            margin-bottom: 10px;
+        }
+        .history-title {
+            font-weight: bold;
+            color: #2d6a2e;
+            margin-bottom: 6px;
+        }
+        .badge {
+            display: inline-block;
+            background: #ff9800;
+            color: white;
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 20px;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+        .btn-small {
+            padding: 8px 12px;
+            font-size: 13px;
+            background: #ff9800;
+            margin-top: 0;
+            width: auto;
+            border-radius: 30px;
+        }
+        .btn-small:disabled {
+            background: #ccc;
+        }
+        .empty-history {
+            text-align: center;
+            color: #93a793;
+            padding: 24px;
+            font-style: italic;
+        }
+        .clear-btn {
+            background: #e0e0e0;
+            color: #555;
+            margin-top: 12px;
+        }
+        .footer-note {
+            font-size: 11px;
+            color: #8a9e88;
+            text-align: center;
+            margin-top: 12px;
+            border-top: 1px solid #e0ecd7;
+            padding-top: 12px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Form nhập liệu -->
+    <div class="card">
+        <h2>🌱 Nhập lên giàn</h2>
+        
+        <div class="form-group">
+            <label>🥬 Loại rau</label>
+            <select id="loaiRau">
+                <option value="dún">Dún</option>
+                <option value="ngọt">Ngọt</option>
+                <option value="thìa">Thìa</option>
+                <option value="xanh">Xanh</option>
+                <option value="ngồng">Ngồng</option>
+                <option value="đuôi phụng">Đuôi phụng</option>
+                <option value="bó xôi">Bó xôi</option>
+                <option value="cầu vồng">Cầu vồng</option>
+                <option value="rau muống">Rau muống</option>
+                <option value="rau dền">Rau dền</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>📅 Ngày gieo (tự động lưu)</label>
+            <input type="date" id="ngayGieo">
+        </div>
+
+        <div class="form-group">
+            <label>🏠 Nhà / Khu</label>
+            <select id="nha">
+                <option value="2.1">2.1</option><option value="2.2">2.2</option>
+                <option value="3A1">3A1</option><option value="3A2">3A2</option>
+                <option value="3B1">3B1</option><option value="3B2">3B2</option>
+                <option value="4.1">4.1</option><option value="4.2">4.2</option>
+                <option value="5.1">5.1</option><option value="5.2">5.2</option>
+                <option value="6.1">6.1</option><option value="6.2">6.2</option>
+                <option value="7.1">7.1</option><option value="7.2">7.2</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>📆 Ngày lên giàn (mặc định hôm nay)</label>
+            <input type="date" id="ngayLenGian">
+        </div>
+
+        <div class="form-group">
+            <label>🔢 Số ống (thập phân được, VD: 10.5)</label>
+            <input type="text" id="soOng" value="1" placeholder="Ví dụ: 12.5">
+        </div>
+
+        <button id="submitBtn">✅ Ghi nhật ký lên Google Sheet</button>
+        <div id="statusMsg" class="status"></div>
+    </div>
+
+    <!-- Lịch sử -->
+    <div class="card">
+        <h2>📋 Lịch sử phiên này</h2>
+        <div id="historyList"></div>
+        <button id="clearHistoryBtn" class="clear-btn" style="display: none;">🧹 Xoá lịch sử hiển thị</button>
+        <div class="footer-note">
+            ⚠️ Bấm "Báo sai" → đánh dấu lỗi ở cột G trên Sheet (không xoá dữ liệu).<br>
+            📌 Lịch sử được lưu trên điện thoại của bạn.
+        </div>
+    </div>
+</div>
+
+<script>
+    // ============================================
+    // 👇👇👇 THAY URL WEB APP CỦA BẠN VÀO ĐÂY 👇👇👇
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxidkKe8kFOMPkclfF2Yy4YuUIWfXmKBCYmV4p0_nTW11BpBWr8hcT6VLZPn7RcuYHT/exec';
+    // ============================================
+    
+    let history = [];
+    
+    // DOM elements
+    const loaiRau = document.getElementById('loaiRau');
+    const ngayGieo = document.getElementById('ngayGieo');
+    const nha = document.getElementById('nha');
+    const ngayLenGian = document.getElementById('ngayLenGian');
+    const soOng = document.getElementById('soOng');
+    const submitBtn = document.getElementById('submitBtn');
+    const statusDiv = document.getElementById('statusMsg');
+    const historyDiv = document.getElementById('historyList');
+    const clearBtn = document.getElementById('clearHistoryBtn');
+    
+    function showMsg(text, type) {
+        statusDiv.textContent = text;
+        statusDiv.className = `status status-${type}`;
+        if (type !== 'loading') {
+            setTimeout(() => statusDiv.style.display = 'none', 3000);
+        }
+        statusDiv.style.display = 'block';
+    }
+    
+    function saveHistory() {
+        localStorage.setItem('thuyCanh_history', JSON.stringify(history));
+    }
+    
+    function loadHistory() {
+        const saved = localStorage.getItem('thuyCanh_history');
+        if (saved) {
+            try { history = JSON.parse(saved); } catch(e) { history = []; }
+        } else { history = []; }
+        renderHistory();
+    }
+    
+    function renderHistory() {
+        if (history.length === 0) {
+            historyDiv.innerHTML = '<div class="empty-history">📭 Chưa có dữ liệu trong phiên này</div>';
+            clearBtn.style.display = 'none';
+            return;
+        }
+        clearBtn.style.display = 'block';
+        let html = '';
+        for (let i = 0; i < history.length; i++) {
+            const item = history[i];
+            const isMarked = item.marked === true;
+            const markedClass = isMarked ? 'marked' : '';
+            const badge = isMarked ? '<span class="badge">Đã báo sai</span>' : '';
+            
+            html += `
+                <div class="history-item ${markedClass}">
+                    <div class="history-info">
+                        <div class="history-title">
+                            ${escapeHtml(item.loaiRau)} ${badge}
+                        </div>
+                        <div>📅 Gieo: ${item.ngayGieo} → ${item.ngayLenGian}</div>
+                        <div>🏠 ${item.nha} | 🔢 Ống: ${item.soOng}</div>
+                    </div>
+                    <button class="btn-small" onclick="markError(${i})" ${isMarked ? 'disabled' : ''}>
+                        ${isMarked ? '✓ Đã xử lý' : '❌ Báo sai (đánh dấu trên sheet)'}
+                    </button>
+                </div>
+            `;
+        }
+        historyDiv.innerHTML = html;
+    }
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+    
+    // Báo sai - chỉ đánh dấu, không xoá
+    window.markError = async function(index) {
+        const item = history[index];
+        if (!item || item.marked) return;
+        
+        if (!confirm(`Đánh dấu SAI cho:\n${item.loaiRau} - ${item.nha}\nNgày ${item.ngayLenGian}?`)) return;
+        
+        showMsg('Đang đánh dấu trên Google Sheet...', 'loading');
+        
+        try {
+            await fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'markError',
+                    rowNumber: item.rowNumber
+                })
+            });
+            
+            history[index].marked = true;
+            saveHistory();
+            renderHistory();
+            showMsg('✅ Đã đánh dấu SAI trên Google Sheet', 'success');
+        } catch(e) {
+            console.error(e);
+            history[index].marked = true;
+            saveHistory();
+            renderHistory();
+            showMsg('⚠️ Đã ghi nhận (hãy mở sheet kiểm tra thủ công)', 'success');
+        }
+    };
+    
+    // Gửi dữ liệu mới
+    async function submitData() {
+        const data = {
+            loaiRau: loaiRau.value,
+            ngayGieo: ngayGieo.value,
+            nha: nha.value,
+            ngayLenGian: ngayLenGian.value || new Date().toISOString().slice(0,10),
+            soOng: soOng.value.trim()
+        };
+        
+        if (!data.ngayGieo) {
+            showMsg('❌ Vui lòng chọn ngày gieo', 'error');
+            return;
+        }
+        if (!data.soOng || isNaN(parseFloat(data.soOng))) {
+            showMsg('❌ Số ống phải là số (VD: 10 hoặc 10.5)', 'error');
+            return;
+        }
+        
+        submitBtn.disabled = true;
+        showMsg('⏳ Đang ghi lên Google Sheet...', 'loading');
+        
+        try {
+            await fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            
+            localStorage.setItem('savedNgayGieo', data.ngayGieo);
+            
+            history.push({
+                rowNumber: Date.now(),
+                loaiRau: data.loaiRau,
+                ngayGieo: data.ngayGieo,
+                nha: data.nha,
+                ngayLenGian: data.ngayLenGian,
+                soOng: data.soOng,
+                marked: false
+            });
+            
+            saveHistory();
+            renderHistory();
+            showMsg('✅ Đã ghi thành công! Kiểm tra Google Sheet để xác nhận.', 'success');
+            soOng.value = '1';
+            
+        } catch(e) {
+            console.error(e);
+            showMsg('❌ Lỗi kết nối. Kiểm tra URL Web App.', 'error');
+        } finally {
+            submitBtn.disabled = false;
+        }
+    }
+    
+    function clearHistoryDisplay() {
+        if (confirm('Xoá lịch sử HIỂN THỊ?\n\n(Dữ liệu trên Google Sheet vẫn giữ nguyên)\nChỉ xoá danh sách trên màn hình này.')) {
+            history = [];
+            saveHistory();
+            renderHistory();
+            showMsg('Đã xoá lịch sử hiển thị', 'success');
+        }
+    }
+    
+    function init() {
+        // Load ngày gieo đã lưu
+        const savedNgayGieo = localStorage.getItem('savedNgayGieo');
+        if (savedNgayGieo) {
+            ngayGieo.value = savedNgayGieo;
+        } else {
+            const d = new Date();
+            d.setDate(d.getDate() - 7);
+            ngayGieo.value = d.toISOString().slice(0,10);
+        }
+        
+        // Mặc định ngày lên giàn = hôm nay
+        if (!ngayLenGian.value) {
+            ngayLenGian.value = new Date().toISOString().slice(0,10);
+        }
+        
+        // Load lịch sử
+        loadHistory();
+        
+        // Sự kiện
+        submitBtn.onclick = submitData;
+        clearBtn.onclick = clearHistoryDisplay;
+        ngayGieo.onchange = () => localStorage.setItem('savedNgayGieo', ngayGieo.value);
+        
+        // Cảnh báo nếu chưa thay URL
+        if (SCRIPT_URL.includes('你的ID')) {
+            showMsg('⚠️ BẠN CẦN THAY URL Web App của mình vào dòng SCRIPT_URL trong code!', 'error');
+        } else {
+            showMsg('✅ Sẵn sàng! Bấm "Ghi nhật ký" để nhập liệu.', 'success');
+        }
+    }
+    
+    init();
+</script>
+</body>
+</html>
